@@ -38,7 +38,7 @@ module RailsUtil
     private
 
     def set_nested_path(nested_path_or_obj, message)
-      return Util.set_nested(nested_path_or_obj, message) if nested_path_or_obj.is_a? String
+      return RailsUtil::Util.set_nested(nested_path_or_obj, message) if nested_path_or_obj.is_a? String
       nested_path_or_obj
     end
 
