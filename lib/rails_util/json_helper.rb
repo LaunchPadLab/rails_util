@@ -1,7 +1,7 @@
 module RailsUtil
   module JsonHelper
 
-    def json_with(resource, **options)    
+    def json_with(resource, **options)
       return json_empty(**options) unless resource
 
       return json_error({
@@ -38,7 +38,7 @@ module RailsUtil
     private
 
     def set_nested_path(nested_path_or_obj, message)
-      return Hash.set(nested_path_or_obj, message) if nested_path_or_obj.is_a? String
+      return RailsUtil::Util.set_nested(nested_path_or_obj, message) if nested_path_or_obj.is_a? String
       nested_path_or_obj
     end
 
