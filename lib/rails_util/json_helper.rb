@@ -3,14 +3,13 @@ module RailsUtil
 
     def json_with(resource, **options)
       return json_empty(**options) unless resource
-      root_key = options.fetch(:root_key, fetch_key_from_resource(resource))
 
       return json_error({
-        root_key => map_base_to__error(resource.errors.messages)
+        resource.class.name.underscore => map_base_to__error(resource.errors.messages)
       }, **options) if has_errors?(resource)
 
       return json_success({
-        root_key => Hash.new
+        resource.class.name.underscore => Hash.new
       }, **options) if is_destroyed?(resource)
 
       render json: resource, **options
@@ -37,11 +36,6 @@ module RailsUtil
     end
 
     private
-
-    def fetch_key_from_resource(resource)
-      return resource.root_key if resource.respond_to?(:root_key)
-      resource.class.name.underscore
-    end
 
     def set_nested_path(nested_path_or_obj, message)
       return RailsUtil::Util.set_nested(nested_path_or_obj, message) if nested_path_or_obj.is_a? String
