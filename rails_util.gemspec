@@ -13,4 +13,7 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://github.com/launchpadlab/rails_util'
   s.license     = 'None'
   s.files       = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+
+  s.add_development_dependency "rspec-rails"
+  s.add_dependency "rails"
 end
