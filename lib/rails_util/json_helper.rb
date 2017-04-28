@@ -3,13 +3,14 @@ module RailsUtil
 
     def json_with(resource, **options)
       return json_empty(**options) unless resource
+      root_key = resource.class.name.split('::').last.underscore
 
       return json_error({
-        resource.class.name.underscore => map_base_to__error(resource.errors.messages)
+        root_key => map_base_to__error(resource.errors.messages)
       }, **options) if has_errors?(resource)
 
       return json_success({
-        resource.class.name.underscore => Hash.new
+        root_key => Hash.new
       }, **options) if is_destroyed?(resource)
 
       render json: resource, **options
