@@ -13,7 +13,7 @@ module RailsUtil
         root_key => Hash.new
       }, **options) if is_destroyed?(resource)
 
-      render json: resource, **options
+      return serialize_json_resource(resource, **options)
     end
 
     def json_empty(**options)
@@ -23,7 +23,7 @@ module RailsUtil
     def json_error(nested_path_or_obj, message=nil, **options)
       error_obj = set_nested_path(nested_path_or_obj, message)
       render(
-        json: error_obj,
+        json: { errors: error_obj },
         status: :unprocessable_entity,
         **options
       )
@@ -36,10 +36,23 @@ module RailsUtil
       )
     end
 
+    def serialize_json_resource(resource, **options)
+      res = ActiveModelSerializers::SerializableResource.new(resource, options[:serializer_options] || {})
+      serialized_obj = res.serializer_instance.object
+      type = options[:resource] || set_serialized_object_type(serialized_obj)
+
+      render json: {
+        data: {
+          type: type,
+          attributes: res.serializer_instance
+        }
+      }, **options
+    end
+
     private
 
     def set_nested_path(nested_path_or_obj, message)
-      return RailsUtil::Util.set_nested(nested_path_or_obj, message) if nested_path_or_obj.is_a? String
+      return set_nested(nested_path_or_obj, message) if nested_path_or_obj.is_a? String
       nested_path_or_obj
     end
 
@@ -56,6 +69,22 @@ module RailsUtil
 
     def is_destroyed?(resource)
       resource.respond_to?(:destroyed?) && resource.destroyed?
+    end
+
+    def set_nested(path, value, obj={})
+      obj.deep_merge(path_to_hash(path, value))
+    end
+
+    def set_serialized_object_type(obj)
+      obj.is_a?(Array) && obj.count.positive? ?
+        obj.first.class.to_s.underscore.pluralize :
+        obj.class.to_s.underscore
+    end
+
+    def path_to_hash(path, value)
+      parts = (path.is_a?(String) ? path.split('.') : path).reverse
+      initial = { parts.shift => value }
+      parts.reduce(initial) { |a, e| { e => a } }
     end
   end
 end
