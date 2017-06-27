@@ -2,7 +2,7 @@ module RailsUtil
   # `RailsUtil::ReactHelper` contains wrapper methods for rendering React components using the `react_on_rails` gem
   module ReactHelper
     # Helper method for rendering a React component to the DOM
-    # A view file named `component.html.erb` containing the `react_component` view helper is also required for this method
+    # Note: A view file named `component.html.erb` containing the `react_component` view helper is also required by this method
     # @example Render a component
     #   # app/controllers/main_controller.rb
     #   class MainController < ApplicationController
