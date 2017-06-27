@@ -5,15 +5,17 @@ module RailsUtil
       return json_empty(**options) unless resource
       root_key = resource.class.name.split('::').last.underscore
 
-      return json_error({
-        root_key => map_base_to__error(resource.errors.messages)
-      }, **options) if has_errors?(resource)
+      return json_error(
+        { root_key => map_base_to__error(resource.errors.messages) },
+        **options
+      ) if has_errors?(resource)
 
-      return json_success({
-        root_key => Hash.new
-      }, **options) if is_destroyed?(resource)
+      return json_success(
+        { root_key => {} },
+        **options
+      ) if is_destroyed?(resource)
 
-      return serialize_json_resource(resource, **options)
+      serialize_json_resource(resource, **options)
     end
 
     def json_empty(**options)
@@ -57,9 +59,7 @@ module RailsUtil
     end
 
     def map_base_to__error(error_obj)
-      if error_obj.has_key? :base
-        error_obj[:_error] = error_obj.delete(:base)
-      end
+      error_obj[:_error] = error_obj.delete(:base) if error_obj.key? :base
       error_obj
     end
 
@@ -76,9 +76,8 @@ module RailsUtil
     end
 
     def set_serialized_object_type(obj)
-      obj.is_a?(Array) && obj.count.positive? ?
-        obj.first.class.to_s.underscore.pluralize :
-        obj.class.to_s.underscore
+      return obj.class.to_s.underscore unless obj.is_a?(Array) && obj.count.positive?
+      obj.first.class.to_s.underscore.pluralize
     end
 
     def path_to_hash(path, value)
