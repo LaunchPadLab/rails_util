@@ -1,6 +1,7 @@
 module RailsUtil
   # `RailsUtil::JsonHelper` contains helper methods for rendering JSON API responses
   module JsonHelper
+    # Renders JSON object, along with other options
     # @param [Object] resource `ActiveRecord` resource
     # @param [Symbol=>[Integer, String, Array]] options the key-value option pairs
     # @return [Object] json object
@@ -21,14 +22,14 @@ module RailsUtil
       serialize_json_resource(resource, **options)
     end
 
-    # Renders empty JSON object, along with any other options
+    # Renders empty JSON object, along with other options
     # @param [Symbol=>[Integer, String, Array]] options the key-value option pairs
     # @return [Object] empty json object
     def json_empty(**options)
       render json: {}, **options
     end
 
-    # Renders JSON error response with `422` status, along with any other options
+    # Renders JSON error response with `422` status, along with other options
     # @param [String, Hash] nested_path_or_obj the key-value option pairs
     # @param [String] message the message to include in the error object
     # @param [Symbol=>[Integer, String, Array]] options the key-value option pairs
@@ -42,7 +43,7 @@ module RailsUtil
       )
     end
 
-    # Renders JSON success response, along with any other options
+    # Renders JSON success response, along with other options
     # @param [String,Hash] path_or_obj the key-value option pairs
     # @param [String=nil] message the message to include in the error object
     # @param [Symbol=>[Integer, String, Array]] options the key-value option pairs
