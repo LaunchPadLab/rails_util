@@ -5,7 +5,7 @@ module RailsUtil
     # Does not mutate the original hash
     # @param [String, Array] path the nested keys
     # @param [String, Integer, Array] value the value of nested path key
-    # @param [Hash] obj the hash object
+    # @param [Hash] obj the hash object to merge
     # @return [Hash] the nested hash
     def self.set_nested(path, value, obj={})
       obj.deep_merge(path_to_hash(path, value))
@@ -15,7 +15,7 @@ module RailsUtil
     # Mutates the original hash
     # @param [String, Array] path the nested keys
     # @param [String, Integer, Array] value the value of nested path key
-    # @param [Hash] obj the hash object
+    # @param [Hash] obj the hash object to merge
     # @return [Hash] the nested hash
     def self.set_nested!(path, value, obj={})
       obj.deep_merge!(path_to_hash(path, value))
