@@ -1,3 +1,4 @@
 module RailsUtil
-  VERSION = '1.0.1'.freeze
+  # Current `RailsUtil` version
+  VERSION = '1.0.2'.freeze
 end
