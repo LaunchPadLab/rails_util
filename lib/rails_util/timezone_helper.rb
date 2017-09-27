@@ -8,8 +8,8 @@ module RailsUtil
 
       # Converts a time in a given timezone to UTC
       # @param [String] timezone the ActiveSupport::TimeZone timezone.tzinfo.name
-      # @param [Time, DateTime] time can be a Time or DateTime object, will use date of this argument if date not provided separately
-      # @param [Symbol=>[DateTime]] options the key-value option pairs, used to provided a separate DateTime object if a specific date is needed, otherwise the date of the time argument is used
+      # @param [Time, DateTime] time can be a Time or DateTime object, will use the date of this argument if date not provided separately
+      # @param [Symbol=>[Date]] options the key-value option pairs, used to provide a separate Date object if a specific date is needed, otherwise the date of the time argument is used
       # @return DateTime object with the time in UTC, and a date of either the provided date or time
       def convert_to_utc(timezone, time, **options)
         convert_time_zone(timezone, time, options).utc
@@ -17,8 +17,8 @@ module RailsUtil
 
       # Converts a time in UTC to the time in the given timezone
       # @param [String] timezone the ActiveSupport::TimeZone timezone.tzinfo.name
-      # @param [Time, DateTime] time can be a Time or DateTime object, will use date of this argument if date not provided separately
-      # @param [Symbol=>[DateTime]] options the key-value option pairs, used to provided a separate DateTime object if a specific date is needed, otherwise the date of the time argument is used
+      # @param [Time, DateTime] time can be a Time or DateTime object, will use the date of this argument if date not provided separately
+      # @param [Symbol=>[Date]] options the key-value option pairs, used to provide a separate Date object if a specific date is needed, otherwise the date of the time argument is used
       # @return DateTime object with the time in the given timezone, and a date of either the provided date or time
       def convert_from_utc(timezone, time, **options)
         time += utc_offset(timezone).hours
