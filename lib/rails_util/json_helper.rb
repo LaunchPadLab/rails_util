@@ -14,12 +14,12 @@ module RailsUtil
       return json_error(
         { root_key => map_base_to__error(resource.errors.messages) },
         **options
-      ) if has_errors?(resource)
+      ) if errors?(resource)
 
       return json_success(
         { root_key => {} },
         **options
-      ) if is_destroyed?(resource)
+      ) if destroyed?(resource)
 
       serialize_json_resource(resource, **options)
     end
@@ -61,11 +61,12 @@ module RailsUtil
     # @param [Object] resource `ActiveRecord` resource
     # @param [Symbol=>[Integer, String, Array]] options the key-value option pairs
     # @return [Object] json resource object
+    # @raise [MissingSerializer] if the provided resource is `nil`
     def serialize_json_resource(resource, **options)
       raise MissingSerializer unless resource.present?
       res = ActiveModelSerializers::SerializableResource.new(resource, options[:serializer_options] || {})
       serialized_obj = res.serializer_instance.object
-      type = options[:resource] || set_serialized_object_type(serialized_obj)
+      type = options[:resource] || serialized_object_type(serialized_obj)
 
       render json: {
         data: {
@@ -87,11 +88,11 @@ module RailsUtil
       error_obj
     end
 
-    def has_errors?(resource)
+    def errors?(resource)
       resource.respond_to?(:errors) && resource.errors.any?
     end
 
-    def is_destroyed?(resource)
+    def destroyed?(resource)
       resource.respond_to?(:destroyed?) && resource.destroyed?
     end
 
@@ -99,7 +100,7 @@ module RailsUtil
       obj.deep_merge(path_to_hash(path, value))
     end
 
-    def set_serialized_object_type(obj)
+    def serialized_object_type(obj)
       return obj.class.to_s.underscore unless obj.is_a?(Array) && obj.count.positive?
       obj.first.class.to_s.underscore.pluralize
     end
