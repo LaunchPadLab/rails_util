@@ -1,6 +1,8 @@
 module RailsUtil
   # `RailsUtil::JsonHelper` contains helper methods for rendering JSON API responses
   module JsonHelper
+    class MissingSerializer < StandardError; end
+
     # Renders JSON object, along with other options
     # @param [Object] resource `ActiveRecord` resource
     # @param [Symbol=>[Integer, String, Array]] options the key-value option pairs
@@ -60,6 +62,7 @@ module RailsUtil
     # @param [Symbol=>[Integer, String, Array]] options the key-value option pairs
     # @return [Object] json resource object
     def serialize_json_resource(resource, **options)
+      raise MissingSerializer unless resource.present?
       res = ActiveModelSerializers::SerializableResource.new(resource, options[:serializer_options] || {})
       serialized_obj = res.serializer_instance.object
       type = options[:resource] || set_serialized_object_type(serialized_obj)
