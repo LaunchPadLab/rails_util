@@ -1,7 +1,8 @@
 require 'active_support/time'
 
 module RailsUtil
-  # `RailsUtil::TimezoneHelper` contains helper methods for converting a time between timezones. Uses `ActiveSupport::TimeZone` `timezone.tzinfo.name` names (e.g., 'America/Chicago') to identify timezones.
+  # `RailsUtil::TimezoneHelper` contains helper methods for converting a time between timezones.
+  # Uses `ActiveSupport::TimeZone` `timezone.tzinfo.name` names (e.g., 'America/Chicago') to identify timezones.
   module TimezoneHelper
     class << self
       SECONDS_PER_HOUR = 3600

@@ -8,7 +8,7 @@ Helper methods for Rails JSON API responses.
 Helper methods for rendering React components using the `react_on_rails` gem.
 
 ## TimezoneHelper
-Helper methods for converting times between UTC and a given timezone.
+Helper methods for converting times between timezones.
 
 ## Documentation
 To view the documentation locally, run:
