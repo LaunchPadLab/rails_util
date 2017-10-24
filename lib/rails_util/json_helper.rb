@@ -71,7 +71,7 @@ module RailsUtil
       render json: {
         data: {
           type: type,
-          attributes: res.serializer_instance
+          attributes: serializable_resource.serializer_instance
         }
       }, **options
     end
