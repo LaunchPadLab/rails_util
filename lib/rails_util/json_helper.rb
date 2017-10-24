@@ -61,7 +61,7 @@ module RailsUtil
     # @param [Object] resource `ActiveRecord` resource
     # @param [Symbol=>[Integer, String, Array]] options the key-value option pairs
     # @return [Object] json resource object
-    # @raise [MissingSerializer] if the provided resource is `nil`
+    # @raise [MissingSerializerError] if the provided resource does not have a serializer
     def serialize_json_resource(resource, **options)
       serializable_resource = ActiveModelSerializers::SerializableResource.new(resource, options[:serializer_options] || {})
       raise MissingSerializerError unless serializable_resource.serializer?
