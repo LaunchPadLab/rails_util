@@ -1,7 +1,7 @@
 module RailsUtil
   # `RailsUtil::JsonHelper` contains helper methods for rendering JSON API responses
   module JsonHelper
-    class MissingSerializer < StandardError; end
+    class MissingSerializerError < StandardError; end
 
     # Renders JSON object, along with other options
     # @param [Object] resource `ActiveRecord` resource
@@ -63,9 +63,9 @@ module RailsUtil
     # @return [Object] json resource object
     # @raise [MissingSerializer] if the provided resource is `nil`
     def serialize_json_resource(resource, **options)
-      raise MissingSerializer unless resource.present?
-      res = ActiveModelSerializers::SerializableResource.new(resource, options[:serializer_options] || {})
-      serialized_obj = res.serializer_instance.object
+      serializable_resource = ActiveModelSerializers::SerializableResource.new(resource, options[:serializer_options] || {})
+      raise MissingSerializerError unless serializable_resource.serializer?
+      serialized_obj = serializable_resource.serializer_instance.object
       type = options[:resource] || serialized_object_type(serialized_obj)
 
       render json: {
