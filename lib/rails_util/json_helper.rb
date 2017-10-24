@@ -1,6 +1,8 @@
 module RailsUtil
   # `RailsUtil::JsonHelper` contains helper methods for rendering JSON API responses
   module JsonHelper
+    class MissingSerializerError < StandardError; end
+
     # Renders JSON object, along with other options
     # @param [Object] resource `ActiveRecord` resource
     # @param [Symbol=>[Integer, String, Array]] options the key-value option pairs
@@ -12,12 +14,12 @@ module RailsUtil
       return json_error(
         { root_key => map_base_to__error(resource.errors.messages) },
         **options
-      ) if has_errors?(resource)
+      ) if errors?(resource)
 
       return json_success(
         { root_key => {} },
         **options
-      ) if is_destroyed?(resource)
+      ) if destroyed?(resource)
 
       serialize_json_resource(resource, **options)
     end
@@ -59,15 +61,17 @@ module RailsUtil
     # @param [Object] resource `ActiveRecord` resource
     # @param [Symbol=>[Integer, String, Array]] options the key-value option pairs
     # @return [Object] json resource object
+    # @raise [MissingSerializerError] if the provided resource does not have a serializer
     def serialize_json_resource(resource, **options)
-      res = ActiveModelSerializers::SerializableResource.new(resource, options[:serializer_options] || {})
-      serialized_obj = res.serializer_instance.object
-      type = options[:resource] || set_serialized_object_type(serialized_obj)
+      serializable_resource = ActiveModelSerializers::SerializableResource.new(resource, options[:serializer_options] || {})
+      raise MissingSerializerError unless serializable_resource.serializer?
+      serialized_obj = serializable_resource.serializer_instance.object
+      type = options[:resource] || serialized_object_type(serialized_obj)
 
       render json: {
         data: {
           type: type,
-          attributes: res.serializer_instance
+          attributes: serializable_resource.serializer_instance
         }
       }, **options
     end
@@ -84,11 +88,11 @@ module RailsUtil
       error_obj
     end
 
-    def has_errors?(resource)
+    def errors?(resource)
       resource.respond_to?(:errors) && resource.errors.any?
     end
 
-    def is_destroyed?(resource)
+    def destroyed?(resource)
       resource.respond_to?(:destroyed?) && resource.destroyed?
     end
 
@@ -96,7 +100,7 @@ module RailsUtil
       obj.deep_merge(path_to_hash(path, value))
     end
 
-    def set_serialized_object_type(obj)
+    def serialized_object_type(obj)
       return obj.class.to_s.underscore unless obj.is_a?(Array) && obj.count.positive?
       obj.first.class.to_s.underscore.pluralize
     end
