@@ -63,7 +63,11 @@ module RailsUtil
     # @return [Object] json resource object
     # @raise [MissingSerializerError] if the provided resource does not have a serializer
     def serialize_json_resource(resource, **options)
-      serializable_resource = ActiveModelSerializers::SerializableResource.new(resource, options[:serializer_options] || {})
+      serializer_options = options[:serializer_options] || {}
+      serializable_resource = ActiveModelSerializers::SerializableResource.new(
+        resource,
+        serializer_options.merge(scope: serialization_scope)
+      )
       raise MissingSerializerError unless serializable_resource.serializer?
       serialized_obj = serializable_resource.serializer_instance.object
       type = options[:resource] || serialized_object_type(serialized_obj)
