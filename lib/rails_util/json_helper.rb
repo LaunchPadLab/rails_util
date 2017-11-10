@@ -31,7 +31,7 @@ module RailsUtil
     # @return [Array] array of json objects
     def json_collection(resource, **options)
       return render json: [], **options unless resource.any?
-      json_with(resources, **options)
+      json_with(resource, **options)
     end
 
     # Renders empty JSON object, along with other options
