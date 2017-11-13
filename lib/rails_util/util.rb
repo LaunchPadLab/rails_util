@@ -33,7 +33,7 @@ module RailsUtil
 
     # Returns the underscored class name of an `ActiveRecord` object
     # @param [ActiveRecord Object] the `ActiveRecord` object
-    # @return [String] the nested hash
+    # @return [String] underscored class name
     def self.underscored_class_name(obj)
       obj.class.to_s.underscore
     end
