@@ -115,8 +115,9 @@ module RailsUtil
     end
 
     def serialized_object_type(obj)
-      return obj.class.to_s.underscore unless obj.is_a?(Array) && obj.count.positive?
-      obj.first.class.to_s.underscore.pluralize
+      is_multiple = obj.try(:length) && obj.length.positive?
+      type = is_multiple ? Util.underscored_class_name(obj.first).pluralize : Util.underscored_class_name(obj)
+      type.split('/').first
     end
 
     def path_to_hash(path, value)
