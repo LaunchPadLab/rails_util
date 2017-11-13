@@ -24,6 +24,16 @@ module RailsUtil
       serialize_json_resource(resource, **options)
     end
 
+    # Renders array of JSON objects, along with other options, or an empty array
+    # if the array contains no values
+    # @param [Array] resources array of resources
+    # @param [Symbol=>[Integer, String, Array]] options the key-value option pairs
+    # @return [Array] array of json objects
+    def json_collection(resource, **options)
+      return render json: [], **options unless resource.any?
+      json_with(resource, **options)
+    end
+
     # Renders empty JSON object, along with other options
     # @param [Symbol=>[Integer, String, Array]] options the key-value option pairs
     # @return [Object] empty json object
