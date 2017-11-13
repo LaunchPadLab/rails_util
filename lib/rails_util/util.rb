@@ -30,5 +30,12 @@ module RailsUtil
       initial = { parts.shift => value }
       parts.reduce(initial) { |a, e| { e => a } }
     end
+
+    # Returns the underscored class name of an `ActiveRecord` object
+    # @param [ActiveRecord Object] the `ActiveRecord` object
+    # @return [String] the nested hash
+    def self.underscored_class_name(obj)
+      obj.class.to_s.underscore
+    end
   end
 end
