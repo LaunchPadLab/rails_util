@@ -82,12 +82,10 @@ module RailsUtil
       serialized_obj = serializable_resource.serializer_instance.object
       type = options[:resource] || serialized_object_type(serialized_obj)
 
-      render json: {
-        data: {
-          type: type,
-          attributes: serializable_resource.serializer_instance
-        }
-      }, **options
+      data = { type: type, attributes: serializable_resource.serializer_instance }
+      data[:additional_data] = options[:additional_data] if options && options[:additional_data]
+
+      render json: { data: data }, **options
     end
 
     private
