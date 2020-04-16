@@ -14,7 +14,7 @@ module RailsUtil
       # @param [Symbol=>[Date]] options key-value option pairs, used to provide a separate Date object if a specific date is needed, otherwise the date of the time argument is used
       # @return DateTime object with the time in the desired `to_timezone`, and a date of either the provided date or time
       def convert_timezone(time, to_timezone, from_timezone, **options)
-        date = options.fetch(:date, time)
+        date = options[:date]
         utc_time = convert_to_utc(time, from_timezone, date)
         convert_from_utc(utc_time, to_timezone, date)
       end
@@ -22,34 +22,32 @@ module RailsUtil
       private
 
       # Returns the time in the given timezone converted to UTC with the formatted offset
-      # @param [String] from_timezone the `ActiveSupport::TimeZone` `timezone.tzinfo.name` of the timezone being converted
       # @param [Time, DateTime] time can be a Time or DateTime object, will use date of Time object if no date provided
-      # @param [Time, DateTime] date optional parameter to specify a date, otherwise the date of the provided time will be used
+      # @param [String] from_timezone the `ActiveSupport::TimeZone` `timezone.tzinfo.name` of the timezone being converted
+      # @param [Date] date optional parameter to specify a date, otherwise the date of the provided time will be used
       # @return DateTime object with the time in UTC, and a date of either the provided date or time
-      def convert_to_utc(time, from_timezone, date=nil)
-        date ||= time
+      def convert_to_utc(time, from_timezone, date)
         timezone_with_offset(time, from_timezone, date).utc
       end
 
       # Returns the time in UTC converted to the given timezone with the formatted offset
-      # @param [String] to_timezone the `ActiveSupport::TimeZone` `timezone.tzinfo.name` of the desired timezone
       # @param [Time, DateTime] time can be a Time or DateTime object, will use date of Time object if no date provided
-      # @param [Time, DateTime] date optional parameter to specify a date, otherwise the date of the provided time will be used
+      # @param [String] to_timezone the `ActiveSupport::TimeZone` `timezone.tzinfo.name` of the desired timezone
+      # @param [Date] date optional parameter to specify a date, otherwise the date of the provided time will be used
       # @return DateTime object with the time in the given timezone, and a date of either the provided date or time
-      def convert_from_utc(time, to_timezone, date=nil)
-        date ||= time
+      def convert_from_utc(time, to_timezone, date)
         time += utc_offset(to_timezone).hours
         timezone_with_offset(time, to_timezone, date)
       end
 
       # Creates a DateTime object with the offset of the given timezone, a time of the time provided, and a date of either the date or time provided
-      # @param [String] timezone the `ActiveSupport::TimeZone` `timezone.tzinfo.name` of the desired timezone
       # @param [Time, DateTime] time can be a Time or DateTime object, will use date of Time object if no date provided
-      # @param [Time, DateTime] date optional parameter to specify a date, otherwise the date of the provided time will be used
+      # @param [String] timezone the `ActiveSupport::TimeZone` `timezone.tzinfo.name` of the desired timezone
+      # @param [Date] date optional parameter to specify a date, otherwise the date of the provided time will be used
       # @return DateTime object in the given time with an offset of the given timezone
-      def timezone_with_offset(time, timezone, date=nil)
+      def timezone_with_offset(time, timezone, date)
         date ||= time
-        DateTime.new(date.year, date.month, date.day, time.hour, time.min, 0, format_offset(timezone))
+        DateTime.new(date.year, date.month, date.day, time.hour, time.min, time.sec, format_offset(timezone))
       end
 
       # Returns a string representation of the UTC offset for the given timezone
