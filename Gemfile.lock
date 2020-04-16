@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rails_util (1.4.0)
+    rails_util (2.0.0)
       activesupport
 
 GEM
