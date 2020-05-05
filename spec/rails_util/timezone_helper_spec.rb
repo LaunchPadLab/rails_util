@@ -27,28 +27,22 @@ describe RailsUtil::TimezoneHelper do
       time_with_offset = DateTime.new(2017, 9, 27, 23, 30, 33, chicago_offset)
       expect(subject.convert_timezone(specific_time, to_timezone, from_timezone, date: date)).to eq(time_with_offset)
     end
-  end
 
-  describe '#convert_to_utc' do
-    it 'no date provided' do
-      agnostic_utc_time = DateTime.new(2000, 1, 1, 11, 30, 33, utc_offset)
-      expect(subject.send(:convert_to_utc, agnostic_time, from_timezone, nil)).to eq(agnostic_utc_time)
-    end
-
-    it 'specific date provided' do
-      expect(subject.send(:convert_to_utc, specific_time, from_timezone, date)).to eq(utc_time)
+    it 'after Daylight Savings' do
+      specific_time = DateTime.new(2017, 12, 28, 0, 30, 33, '-05:00')
+      time_with_offset = DateTime.new(2017, 12, 27, 23, 30, 33, '-06:00')
+      allow(subject).to receive(:utc_offset).and_return(-6) ## This method changes throughout the year, but the calculation should be applicable
+      expect(subject.convert_timezone(specific_time, to_timezone, from_timezone)).to eq(time_with_offset)
     end
   end
 
-  describe '#convert_from_utc' do
-    it 'no date provided' do
-      chicago_time = DateTime.new(2017, 9, 26, 23, 30, 33, chicago_offset)
-      expect(subject.send(:convert_from_utc, utc_time, to_timezone, nil)).to eq(chicago_time)
+  describe '#offset_in_seconds' do
+    it 'positive offset' do
+      expect(subject.send(:offset_in_seconds, specific_time, from_timezone, to_timezone)).to eq(3600.seconds)
     end
 
-    it 'specific date provided' do
-      chicago_time = DateTime.new(2017, 9, 27, 23, 30, 33, chicago_offset)
-      expect(subject.send(:convert_from_utc, utc_time, to_timezone, date)).to eq(chicago_time)
+    it 'negative offset' do
+      expect(subject.send(:offset_in_seconds, specific_time, to_timezone, from_timezone)).to eq(-3600.seconds)
     end
   end
 
@@ -66,7 +60,7 @@ describe RailsUtil::TimezoneHelper do
 
   describe '#format_offset' do
     it 'behind utc' do
-      expect(subject.send(:format_offset, from_timezone)).to eq(chicago_offset)
+      expect(subject.send(:format_offset, to_timezone)).to eq(chicago_offset)
     end
 
     it 'ahead of utc' do
