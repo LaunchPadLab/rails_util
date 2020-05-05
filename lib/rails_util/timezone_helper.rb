@@ -59,7 +59,7 @@ module RailsUtil
         offset = utc_offset(timezone).to_s
         offset.insert(1, '0') if utc_offset(timezone).abs < 10
         plus_sign = '+' unless offset.include? '-'
-        [plus_sign, offset, ':00'].compact.join('')
+        [plus_sign, offset, ':00'].compact.join
       end
 
       # Returns a fixnum representation of the UTC offset for the given timezone in hours, taking into account whether Daylight Savings Time is in effect
