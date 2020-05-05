@@ -1,65 +1,66 @@
 require 'spec_helper'
 
 describe RailsUtil::TimezoneHelper do
-  let(:from_timezone) { 'America/Chicago' } # currently 5 hours behind UTC
-  let(:to_timezone) { 'America/New_York' } # currently 5 hours behind UTC
+  let(:to_timezone) { 'America/Chicago' } # currently 5 hours behind UTC
+  let(:from_timezone) { 'America/New_York' } # currently 4 hours behind UTC
+  let(:utc_timezone) { 'Etc/UTC' }
 
-  let(:time) { Time.new(2000, 1, 1, 7, 30, 0) } # arbitrary date, timezone agnostic time
+
+  let(:chicago_offset) { '-05:00' }
+  let(:new_york_offset) { '-04:00' }
+  let(:utc_offset) { '+00:00' }
+
+  let(:agnostic_time) { Time.new(2000, 1, 1, 7, 30, 33) } # arbitrary date, timezone agnostic time
+  let(:specific_time) { DateTime.new(2017, 9, 27, 0, 30, 33, new_york_offset) } # specific datetime object
+  let(:utc_time) { DateTime.new(2017, 9, 27, 4, 30, 33, utc_offset) } # specific datetime object
   let(:date) { Date.new(2017, 9, 27) }
 
   let(:subject) { RailsUtil::TimezoneHelper }
 
   describe '#convert_timezone' do
     it 'no date provided' do
-      time_with_offset = DateTime.new(2000, 1, 1, 8, 30, 0, '-04:00')
-      expect(subject.convert_timezone(time, to_timezone, from_timezone)).to eq(time_with_offset)
+      time_with_offset = DateTime.new(2017, 9, 26, 23, 30, 33, chicago_offset)
+      expect(subject.convert_timezone(specific_time, to_timezone, from_timezone)).to eq(time_with_offset)
     end
 
     it 'specific date provided' do
-      time_with_offset = DateTime.new(2017, 9, 27, 8, 30, 0, '-04:00')
-      expect(subject.convert_timezone(time, to_timezone, from_timezone, date: date)).to eq(time_with_offset)
+      time_with_offset = DateTime.new(2017, 9, 27, 23, 30, 33, chicago_offset)
+      expect(subject.convert_timezone(specific_time, to_timezone, from_timezone, date: date)).to eq(time_with_offset)
+    end
+
+    it 'after Daylight Savings' do
+      specific_time = DateTime.new(2017, 12, 28, 0, 30, 33, '-05:00')
+      time_with_offset = DateTime.new(2017, 12, 27, 23, 30, 33, '-06:00')
+      allow(subject).to receive(:utc_offset).and_return(-6) ## This method changes throughout the year, but the calculation should be applicable
+      expect(subject.convert_timezone(specific_time, to_timezone, from_timezone)).to eq(time_with_offset)
     end
   end
 
-  describe '#convert_to_utc' do
-    it 'no date provided' do
-      utc_time = DateTime.new(2000, 1, 1, 12, 30, 0, '+00:00')
-      expect(subject.send(:convert_to_utc, time, from_timezone)).to eq(utc_time)
+  describe '#offset_in_seconds' do
+    it 'positive offset' do
+      expect(subject.send(:offset_in_seconds, specific_time, from_timezone, to_timezone)).to eq(3600.seconds)
     end
 
-    it 'specific date provided' do
-      utc_time = DateTime.new(2017, 9, 27, 12, 30, 0, '+00:00')
-      expect(subject.send(:convert_to_utc, time, from_timezone, date)).to eq(utc_time)
-    end
-  end
-
-  describe '#convert_from_utc' do
-    it 'no date provided' do
-      chicago_time = DateTime.new(2000, 1, 1, 2, 30, 0, '-05:00')
-      expect(subject.send(:convert_from_utc, time, from_timezone)).to eq(chicago_time)
-    end
-
-    it 'specific date provided' do
-      chicago_time = DateTime.new(2017, 9, 27, 2, 30, 0, '-05:00')
-      expect(subject.send(:convert_from_utc, time, from_timezone, date)).to eq(chicago_time)
+    it 'negative offset' do
+      expect(subject.send(:offset_in_seconds, specific_time, to_timezone, from_timezone)).to eq(-3600.seconds)
     end
   end
 
   describe '#timezone_with_offset' do
     it 'no date provided' do
-      chicago_time = DateTime.new(2000, 1, 1, 7, 30, 0, '-05:00')
-      expect(subject.send(:timezone_with_offset, time, from_timezone)).to eq(chicago_time)
+      chicago_time = DateTime.new(2000, 1, 1, 7, 30, 33, chicago_offset)
+      expect(subject.send(:timezone_with_offset, agnostic_time, to_timezone, nil)).to eq(chicago_time)
     end
 
     it 'specific date provided' do
-      chicago_time = DateTime.new(2017, 9, 27, 7, 30, 0, '-05:00')
-      expect(subject.send(:timezone_with_offset, time, from_timezone, date)).to eq(chicago_time)
+      chicago_time = DateTime.new(2017, 9, 27, 0, 30, 33, chicago_offset)
+      expect(subject.send(:timezone_with_offset, specific_time, to_timezone, date)).to eq(chicago_time)
     end
   end
 
   describe '#format_offset' do
     it 'behind utc' do
-      expect(subject.send(:format_offset, from_timezone)).to eq('-05:00')
+      expect(subject.send(:format_offset, to_timezone)).to eq(chicago_offset)
     end
 
     it 'ahead of utc' do
@@ -69,7 +70,7 @@ describe RailsUtil::TimezoneHelper do
 
   describe '#utc_offset' do
     it 'returns FixNum offset' do
-      expect(subject.send(:utc_offset, from_timezone)).to eq(-5)
+      expect(subject.send(:utc_offset, to_timezone)).to eq(-5)
     end
   end
 end
