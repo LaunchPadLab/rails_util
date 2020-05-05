@@ -58,8 +58,12 @@ describe RailsUtil::TimezoneHelper do
   end
 
   describe '#format_offset' do
-    it 'returns formatted string offset' do
+    it 'behind utc' do
       expect(subject.send(:format_offset, from_timezone)).to eq('-05:00')
+    end
+
+    it 'ahead of utc' do
+      expect(subject.send(:format_offset, 'Australia/Melbourne')).to eq('+10:00')
     end
   end
 
