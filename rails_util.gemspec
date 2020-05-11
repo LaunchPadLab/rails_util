@@ -15,6 +15,6 @@ Gem::Specification.new do |s|
   s.files       = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
 
   s.add_development_dependency 'rspec'
-  s.add_dependency 'activesupport', '~> 5'
+  s.add_dependency 'activesupport'
   s.add_dependency 'pry'
 end

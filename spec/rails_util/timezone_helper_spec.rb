@@ -38,11 +38,11 @@ describe RailsUtil::TimezoneHelper do
 
   describe '#offset_in_seconds' do
     it 'positive offset' do
-      expect(subject.send(:offset_in_seconds, specific_time, from_timezone, to_timezone)).to eq(3600.seconds)
+      expect(subject.send(:offset_in_seconds, from_timezone, to_timezone)).to eq(3600.seconds)
     end
 
     it 'negative offset' do
-      expect(subject.send(:offset_in_seconds, specific_time, to_timezone, from_timezone)).to eq(-3600.seconds)
+      expect(subject.send(:offset_in_seconds, to_timezone, from_timezone)).to eq(-3600.seconds)
     end
   end
 

@@ -15,7 +15,7 @@ module RailsUtil
       # @param [Symbol=>[Date]] options key-value option pairs, used to provide a separate Date object if a specific date is needed, otherwise the date of the time argument is used
       # @return DateTime object with the time in the desired `to_timezone`, and a date of either the provided date or time
       def convert_timezone(time, to_timezone, from_timezone, **options)
-        converted_time = time + offset_in_seconds(time, to_timezone, from_timezone)
+        converted_time = time + offset_in_seconds(to_timezone, from_timezone)
         timezone_with_offset(converted_time, to_timezone, options[:date])
       end
 
@@ -26,7 +26,8 @@ module RailsUtil
       # @param [String] to_timezone the `ActiveSupport::TimeZone` `timezone.tzinfo.name` of the desired timezone
       # @param [String] to_timezone the `ActiveSupport::TimeZone` `timezone.tzinfo.name` of the timezone being converted
       # @return ActiveSupport::Duration object as the number of seconds between the given timezones
-      def offset_in_seconds(time, to_timezone, from_timezone)
+      def offset_in_seconds(to_timezone, from_timezone)
+        time = Time.now
         (time.in_time_zone(to_timezone).utc_offset - time.in_time_zone(from_timezone).utc_offset).seconds
       end
 
