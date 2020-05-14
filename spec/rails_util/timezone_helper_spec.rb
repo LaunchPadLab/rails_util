@@ -31,18 +31,18 @@ describe RailsUtil::TimezoneHelper do
     it 'after Daylight Savings' do
       specific_time = DateTime.new(2017, 12, 28, 0, 30, 33, '-05:00')
       time_with_offset = DateTime.new(2017, 12, 27, 23, 30, 33, '-06:00')
-      allow(subject).to receive(:utc_offset).and_return(-6) ## This method changes throughout the year, but the calculation should be applicable
+      allow(subject).to receive(:utc_offset_in_hours).and_return(-6) ## This method changes throughout the year, but the calculation should be applicable
       expect(subject.convert_timezone(specific_time, to_timezone, from_timezone)).to eq(time_with_offset)
     end
   end
 
-  describe '#offset_in_seconds' do
+  describe '#timezone_difference_in_seconds' do
     it 'positive offset' do
-      expect(subject.send(:offset_in_seconds, from_timezone, to_timezone)).to eq(3600.seconds)
+      expect(subject.send(:timezone_difference_in_seconds, from_timezone, to_timezone)).to eq(3600.seconds)
     end
 
     it 'negative offset' do
-      expect(subject.send(:offset_in_seconds, to_timezone, from_timezone)).to eq(-3600.seconds)
+      expect(subject.send(:timezone_difference_in_seconds, to_timezone, from_timezone)).to eq(-3600.seconds)
     end
   end
 
@@ -68,9 +68,9 @@ describe RailsUtil::TimezoneHelper do
     end
   end
 
-  describe '#utc_offset' do
+  describe '#utc_offset_in_hours' do
     it 'returns FixNum offset' do
-      expect(subject.send(:utc_offset, to_timezone)).to eq(-5)
+      expect(subject.send(:utc_offset_in_hours, to_timezone)).to eq(-5)
     end
   end
 end
