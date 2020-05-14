@@ -5,6 +5,7 @@ describe RailsUtil::TimezoneHelper do
   let(:from_timezone) { 'America/New_York' }
   let(:seconds_per_hour) { 3600 }
 
+  ## Providing the correct string UTC offset so these specs pass all year long (accounting for DST)
   let(:chicago_offset) do
     offset_str = (TZInfo::Timezone.get(to_timezone).current_period.utc_total_offset / seconds_per_hour).to_s
     [offset_str.insert(1, '0'), ':00'].compact.join
