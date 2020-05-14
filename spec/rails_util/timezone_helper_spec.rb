@@ -1,13 +1,21 @@
 require 'spec_helper'
 
 describe RailsUtil::TimezoneHelper do
-  let(:to_timezone) { 'America/Chicago' } # currently 5 hours behind UTC
-  let(:from_timezone) { 'America/New_York' } # currently 4 hours behind UTC
-  let(:utc_timezone) { 'Etc/UTC' }
+  let(:to_timezone) { 'America/Chicago' }
+  let(:from_timezone) { 'America/New_York' }
+  let(:seconds_per_hour) { 3600 }
 
+  ## Providing the correct string UTC offset so these specs pass all year long (accounting for DST)
+  let(:chicago_offset) do
+    offset_str = (TZInfo::Timezone.get(to_timezone).current_period.utc_total_offset / seconds_per_hour).to_s
+    [offset_str.insert(1, '0'), ':00'].compact.join
+  end
 
-  let(:chicago_offset) { '-05:00' }
-  let(:new_york_offset) { '-04:00' }
+  let(:new_york_offset) do
+    offset_str = (TZInfo::Timezone.get(from_timezone).current_period.utc_total_offset / seconds_per_hour).to_s
+    [offset_str.insert(1, '0'), ':00'].compact.join
+  end
+
   let(:utc_offset) { '+00:00' }
 
   let(:agnostic_time) { Time.new(2000, 1, 1, 7, 30, 33) } # arbitrary date, timezone agnostic time
@@ -27,22 +35,15 @@ describe RailsUtil::TimezoneHelper do
       time_with_offset = DateTime.new(2017, 9, 27, 23, 30, 33, chicago_offset)
       expect(subject.convert_timezone(specific_time, to_timezone, from_timezone, date: date)).to eq(time_with_offset)
     end
-
-    it 'after Daylight Savings' do
-      specific_time = DateTime.new(2017, 12, 28, 0, 30, 33, '-05:00')
-      time_with_offset = DateTime.new(2017, 12, 27, 23, 30, 33, '-06:00')
-      allow(subject).to receive(:utc_offset).and_return(-6) ## This method changes throughout the year, but the calculation should be applicable
-      expect(subject.convert_timezone(specific_time, to_timezone, from_timezone)).to eq(time_with_offset)
-    end
   end
 
-  describe '#offset_in_seconds' do
+  describe '#timezone_difference_in_seconds' do
     it 'positive offset' do
-      expect(subject.send(:offset_in_seconds, specific_time, from_timezone, to_timezone)).to eq(3600.seconds)
+      expect(subject.send(:timezone_difference_in_seconds, from_timezone, to_timezone)).to eq(3600.seconds)
     end
 
     it 'negative offset' do
-      expect(subject.send(:offset_in_seconds, specific_time, to_timezone, from_timezone)).to eq(-3600.seconds)
+      expect(subject.send(:timezone_difference_in_seconds, to_timezone, from_timezone)).to eq(-3600.seconds)
     end
   end
 
@@ -68,9 +69,9 @@ describe RailsUtil::TimezoneHelper do
     end
   end
 
-  describe '#utc_offset' do
-    it 'returns FixNum offset' do
-      expect(subject.send(:utc_offset, to_timezone)).to eq(-5)
+  describe '#utc_offset_in_hours' do
+    it 'returns FixNum offset (negative for Chicago)' do
+      expect(subject.send(:utc_offset_in_hours, to_timezone)).to be_negative
     end
   end
 end
