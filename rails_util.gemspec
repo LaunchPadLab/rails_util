@@ -17,4 +17,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec'
   s.add_dependency 'activesupport'
   s.add_dependency 'pry'
+  s.add_dependency 'active_model_serializers'
 end
